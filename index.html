@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Telas editáveis</title>
+<style>
+:root{
+  --bg:#202630;--surface:#272e39;--text:#eeeef0;
+  --muted:#838994;--yellow:#f8d32b;--green:#2bb885;
+  --red:#f54165;--line:#303741;--success-bg:#22252d;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;color:inherit;border:0;background:none}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
+svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+[hidden]{display:none!important}
+.phone{width:100%;max-width:604px;margin:auto;min-height:100dvh;position:relative;background:var(--bg)}
+.home{padding:0 24px 180px}
+.header{height:72px;display:flex;align-items:center;gap:23px}
+.icon{padding:0;display:grid;place-items:center;position:relative;min-width:26px;height:36px}
+.header svg{width:28px;height:28px}
+.top-switch{display:flex;background:var(--surface);padding:5px;border-radius:12px;margin:auto;min-width:0}
+.top-switch button{font-size:21px;color:var(--muted);padding:9px 12px;border-radius:8px;white-space:nowrap}
+.top-switch .active{color:var(--text);background:#353b46;box-shadow:0 0 7px #0003}
+.counter{position:absolute;top:-1px;right:-9px;background:var(--yellow);color:var(--bg);font-size:12px;border-radius:50%;padding:2px 4px}
+.search{margin-top:9px;background:var(--surface);border-radius:12px;display:flex;align-items:center;gap:7px;height:50px;padding:0 15px;color:var(--muted)}
+.search input{min-width:0;flex:1;border:0;outline:none;color:var(--muted);background:none;font-size:20px}
+.search svg{width:24px;height:24px}
+.balance{margin-top:30px}
+.balance-label{font-size:20px;display:flex;align-items:center;gap:8px}
+.balance-label svg{width:17px;height:17px}
+.balance-main{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:16px}
+.balance-value{font-size:48px;font-weight:700;white-space:nowrap}
+.add-funds{background:var(--yellow);color:#1f232a;border-radius:6px;min-height:50px;width:185px;font-size:21px;line-height:23px;padding:4px 12px}
+.pnl{margin-top:20px;display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:17px;color:var(--muted)}
+.pnl-label{border-bottom:1px dashed var(--muted);padding-bottom:3px}
+.pnl-value{color:var(--red);display:flex;align-items:center;gap:6px}
+.pnl-value svg{width:16px;height:16px}
+.markets{margin-top:24px;background:var(--surface);border-radius:17px;padding:24px 24px 16px;overflow:hidden}
+.tabs{display:flex;align-items:center;gap:25px;white-space:nowrap;overflow:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{font-size:23px;padding:0;color:var(--muted)}
+.tabs button.active{font-weight:700;color:var(--text)}
+.tabs .list-icon{margin-left:auto}
+.subtabs{display:flex;gap:24px;margin-top:24px}
+.subtabs button{font-size:20px;color:var(--muted);padding:0}
+.subtabs button.active{color:var(--text);font-weight:600}
+.column-labels{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:12px;margin-top:21px;color:var(--muted);font-size:19px;white-space:nowrap}
+.column-labels span:nth-child(n+2){text-align:right;overflow:hidden;text-overflow:ellipsis}
+.rows{margin-top:13px}
+.coin-row{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:20px;align-items:center;min-height:80px}
+.coin-name{font-size:22px;display:flex;align-items:center;gap:8px;min-width:0}
+.coin-name .coin-symbol{overflow-wrap:anywhere}
+.flame{color:var(--yellow);font-size:22px;line-height:1}
+.price{text-align:right;min-width:0}
+.price strong{display:block;font-size:22px;font-weight:500;overflow-wrap:anywhere}
+.price small{display:block;color:var(--muted);font-size:18px;margin-top:3px;overflow-wrap:anywhere}
+.change{background:var(--green);font-size:21px;text-align:center;border-radius:5px;min-height:41px;padding:7px 5px;width:100%;overflow-wrap:anywhere}
+.more{display:block;margin:9px auto 0;color:var(--muted);font-size:20px;padding:8px}
+.chat{margin-top:25px;background:var(--surface);border-radius:16px;padding:21px 18px}
+.chat-heading{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:20px}
+.chat-heading svg{width:18px;height:18px}
+.chat-item{display:flex;align-items:center;gap:18px;margin-top:21px}
+.avatar{width:40px;height:40px;border-radius:50%;background:#e6e9eb;position:relative;flex-shrink:0;overflow:hidden}
+.avatar:before{content:'';position:absolute;top:5px;left:11px;width:20px;height:20px;background:var(--yellow);border-radius:50%}
+.avatar:after{content:'';position:absolute;bottom:-4px;left:12px;width:18px;height:20px;background:var(--yellow);border-radius:8px 8px 0 0}
+.chat-copy{min-width:0;flex:1}
+.chat-name{font-size:17px}
+.chat-preview{font-size:17px;color:var(--muted);margin-top:5px}
+.unread{background:var(--yellow);color:var(--bg);border-radius:50%;min-width:25px;height:25px;display:grid;place-items:center;font-size:16px}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:604px;background:var(--bg);z-index:5}
+.discover{display:flex;align-items:center;gap:25px;overflow:hidden;padding:20px 22px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);white-space:nowrap}
+.discover button{font-size:23px;color:var(--muted);padding:0;position:relative}
+.discover .active{color:var(--text)}
+.notification-dot:after{content:'';position:absolute;right:-7px;top:-7px;background:var(--yellow);width:9px;height:9px;border-radius:50%}
+.bottom-nav{display:flex;justify-content:space-between;padding:18px 24px 23px}
+.bottom-nav button{display:flex;flex-direction:column;align-items:center;gap:7px;font-size:14px;color:var(--muted);padding:0;min-width:0}
+.bottom-nav svg{width:30px;height:30px}
+.bottom-nav .active svg{color:var(--yellow)}
+.bottom-nav .active{color:var(--text)}
+.home-indicator{width:37%;max-width:224px;height:5px;background:var(--text);border-radius:8px;margin:5px auto 10px}
+.success{min-height:100dvh;background:var(--success-bg);padding:23px 23px 40px;position:relative}
+.close-success{display:block;margin-left:auto;padding:0}
+.close-success svg{width:29px;height:29px}
+.success-summary{text-align:center;padding-top:130px}
+.check-ring{width:132px;height:132px;border:3px solid var(--green);border-radius:50%;margin:0 auto 40px;display:grid;place-items:center}
+.check-circle{width:94px;height:94px;background:var(--green);color:#173e30;border-radius:50%;display:grid;place-items:center}
+.check-circle svg{width:65px;height:65px;stroke-width:4}
+.success-amount{display:flex;align-items:baseline;justify-content:center;gap:8px;flex-wrap:wrap;font-size:44px;font-weight:700}
+.success-currency{font-size:30px}
+.success-description{color:var(--muted);font-size:22px;margin:23px 0}
+.verify{color:var(--yellow);font-size:22px;padding:0}
+.rating{margin-top:99px;text-align:center}
+.rating-title{font-size:22px;margin-bottom:25px}
+.rating-buttons{display:grid;grid-template-columns:1fr 1fr;gap:25px}
+.rating-buttons button{border:1px solid var(--line);border-radius:8px;min-height:63px;font-size:22px;display:flex;align-items:center;justify-content:center;gap:20px}
+.rating-buttons svg{width:31px;height:31px}
+.rating-buttons button.selected{border-color:var(--yellow);color:var(--yellow)}
+.task{background:var(--surface);border-radius:8px;margin-top:78px;padding:23px 18px}
+.task-heading{font-size:22px;color:var(--muted);margin-bottom:17px}
+.task-body{display:flex;gap:23px;align-items:center}
+.task-body svg{width:26px;height:26px}
+.task-copy{font-size:20px;font-weight:600;line-height:1.5;flex:1;min-width:0}
+.trade{background:#30353e;border-radius:4px;padding:12px 15px;font-size:18px;font-weight:600}
+[contenteditable="true"]{outline:1px dashed #f8d32b66;outline-offset:3px;cursor:text;min-width:12px}
+[contenteditable="true"]:focus{outline:1px solid var(--yellow)}
+body.editing .change{outline:1px dashed var(--yellow);outline-offset:3px}
+.editor{position:fixed;inset:0;background:#0008;z-index:20;display:flex;justify-content:flex-end}
+.editor-panel{width:min(100%,380px);background:var(--surface);padding:22px;overflow:auto;height:100dvh;box-shadow:-8px 0 30px #0004}
+.editor-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.editor h2{font-size:21px;margin:0}
+.editor h3{font-size:16px;margin:24px 0 12px;color:var(--yellow)}
+.editor label{font-size:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0}
+.editor input:not([type=checkbox]),.editor select{width:145px;max-width:100%;background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:7px;color:var(--text)}
+.editor input[type=color]{height:35px;padding:3px!important}
+.editor .command{width:100%;padding:11px;background:var(--bg);border:1px solid var(--line);border-radius:5px;text-align:left;margin:4px 0}
+.editor .primary{background:var(--yellow);color:var(--bg);text-align:center;font-weight:700}
+.editor-help{font-size:14px;color:var(--muted);line-height:1.6}
+.row-manager{display:flex;align-items:center;gap:8px;margin:10px 0}
+.row-manager span{flex:1;overflow-wrap:anywhere}
+.row-manager button{border:1px solid var(--line);border-radius:4px;min-width:29px;height:29px}
+.editor-status{font-size:13px;color:var(--yellow);min-height:20px}
+.badge-dialog{border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);padding:24px;width:min(90%,340px)}
+.badge-dialog::backdrop{background:#0009}
+.badge-dialog h2{font-size:19px;margin:0 0 20px}
+.badge-dialog label{display:block;margin:12px 0;font-size:14px}
+.badge-dialog input{display:block;width:100%;margin-top:6px;padding:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:4px}
+.badge-dialog input[type=color]{height:44px;padding:3px}
+.dialog-actions{display:flex;justify-content:flex-end;gap:15px;margin-top:20px}
+.dialog-actions .save{background:var(--yellow);color:var(--bg);padding:10px 18px;border-radius:4px}
+@media(max-width:480px){
+ .home{padding:0 16px 140px}.header{height:49px;gap:14px}.header svg{width:22px;height:22px}
+ .top-switch{padding:3px;border-radius:8px}.top-switch button{font-size:15px;padding:6px 9px}
+ .search{height:34px;margin-top:5px;padding:0 10px;border-radius:8px}.search input{font-size:14px}.search svg{width:19px;height:19px}
+ .balance{margin-top:19px}.balance-label{font-size:14px}.balance-main{margin-top:11px;gap:10px}.balance-value{font-size:32px}
+ .add-funds{width:123px;min-height:34px;font-size:15px;line-height:16px;border-radius:4px}
+ .pnl{font-size:11px;margin-top:13px;gap:4px}.markets{margin-top:16px;padding:17px 16px 10px;border-radius:12px}
+ .tabs{gap:19px}.tabs button{font-size:16px}.tabs svg{width:20px;height:20px}
+ .subtabs{margin-top:17px;gap:18px}.subtabs button{font-size:14px}
+ .column-labels{font-size:13px;gap:8px;margin-top:16px;grid-template-columns:1fr 1.2fr 1fr}
+ .rows{margin-top:9px}.coin-row{min-height:53px;gap:17px}.coin-name{font-size:15px;gap:6px}.flame{font-size:16px}
+ .price strong{font-size:15px}.price small{font-size:12px;margin-top:2px}.change{font-size:14px;min-height:27px;padding:5px 3px;border-radius:4px}
+ .more{font-size:14px;margin-top:6px;padding:6px}.chat{margin-top:17px;padding:14px 12px;border-radius:11px}
+ .chat-heading{font-size:14px}.chat-item{gap:12px;margin-top:15px}.avatar{width:28px;height:28px}
+ .avatar:before{width:14px;height:14px;left:7px;top:4px}.avatar:after{width:13px;height:15px;left:8px}
+ .chat-name,.chat-preview{font-size:12px}.chat-preview{margin-top:3px}.unread{height:17px;min-width:17px;font-size:12px}
+ .discover{gap:19px;padding:13px 15px}.discover button{font-size:16px}.bottom-nav{padding:12px 27px 16px}
+ .bottom-nav button{font-size:10px;gap:5px}.bottom-nav svg{width:23px;height:23px}.home-indicator{height:4px;margin:3px auto 7px}
+ .success{padding:16px 14px 30px}.close-success svg{width:23px;height:23px}.success-summary{padding-top:86px}
+ .check-ring{width:84px;height:84px;border-width:2px;margin-bottom:26px}.check-circle{width:59px;height:59px}.check-circle svg{width:42px;height:42px}
+ .success-amount{font-size:29px;gap:6px}.success-currency{font-size:20px}.success-description{font-size:15px;margin:16px 0}
+ .verify{font-size:15px}.rating{margin-top:64px}.rating-title{font-size:15px;margin-bottom:17px}
+ .rating-buttons{gap:18px}.rating-buttons button{font-size:15px;min-height:42px;gap:13px}.rating-buttons svg{width:23px;height:23px}
+ .task{margin-top:52px;padding:15px 12px}.task-heading{font-size:15px;margin-bottom:11px}.task-body{gap:15px}
+ .task-copy{font-size:14px;line-height:1.45}.task-body svg{width:22px;height:22px}.trade{font-size:12px;padding:9px}
+}
+@media(max-width:350px){.header{gap:9px}.top-switch button{font-size:13px}.coin-row{gap:9px}.balance-value{font-size:29px}.add-funds{width:105px}.task-body{gap:8px}.rating-buttons button{gap:8px}}
+</style>
+</head>
+<body>
+<!-- Ícones desenhados em HTML/SVG; não precisa de internet. -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<symbol id="menu" viewBox="0 0 24 24"><path d="M3 5h18M3 12h18M3 19h18"/></symbol>
+<symbol id="support" viewBox="0 0 24 24"><path d="M4 15c0-6 3-10 8-10s8 4 8 10M4 12H2v6h4v-6H4m16 0h2v6h-4v-6h2M18 18c-1 4-5 4-7 4"/><circle cx="12" cy="8" r="3"/></symbol>
+<symbol id="scan" viewBox="0 0 24 24"><path d="M8 2H2v6m14-6h6v6M2 16v6h6m14-6v6h-6M6 12h12"/></symbol>
+<symbol id="chat" viewBox="0 0 24 24"><path d="M3 3h18v14H10l-6 5v-5H3zM7 7h10M7 11h10"/></symbol>
+<symbol id="search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/></symbol>
+<symbol id="up" viewBox="0 0 24 24"><path d="m5 15 7-7 7 7"/></symbol>
+<symbol id="down" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></symbol>
+<symbol id="right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+<symbol id="close" viewBox="0 0 24 24"><path d="m4 4 16 16M20 4 4 20"/></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path d="m4 12 6 6L21 4"/></symbol>
+<symbol id="thumb" viewBox="0 0 24 24"><path d="M3 10h4v11H3zM7 20h11l3-10h-7l1-5c0-3-3-4-4-2l-4 7z"/></symbol>
+<symbol id="brand" viewBox="0 0 24 24"><path d="m12 2 4 4-4 4-4-4zm0 12 4 4-4 4-4-4zM2 12l4-4 4 4-4 4zm12 0 4-4 4 4-4 4z"/></symbol>
+<symbol id="chart" viewBox="0 0 24 24"><path d="M3 21h18M4 15l5-6 4 3 7-9M15 3h5v5"/></symbol>
+<symbol id="exchange" viewBox="0 0 24 24"><path d="M3 10a9 9 0 0 1 16-5l2 3M21 3v5h-5M21 14A9 9 0 0 1 5 19l-2-3M3 21v-5h5"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="document" viewBox="0 0 24 24"><path d="M4 2h14v20H4zM8 6h6M8 10h6M8 14h4m5 4 3-3 3 3-3 3z"/></symbol>
+<symbol id="wallet" viewBox="0 0 24 24"><path d="M3 4h15v4H3zm0 4h18v14H3zM15 12l3 3-3 3-3-3z"/></symbol>
+<symbol id="lock" viewBox="0 0 24 24"><rect x="6" y="10" width="12" height="12" rx="4"/><path d="M10 10V6a4 4 0 0 1 8 0v5"/></symbol>
+</svg>
+
+<main class="phone">
+<section id="homeScreen" class="home">
+<header class="header">
+<button class="icon" id="openEditor" aria-label="Abrir editor" title="Editar textos, cores e estrutura"><svg><use href="#menu"/></svg></button>
+<button class="icon" data-editor aria-label="Editar conta"><svg><use href="#support"/></svg></button>
+<div class="top-switch"><button class="active" data-edit>Exchange</button><button data-edit>Carteira</button></div>
+<button class="icon" data-editor aria-label="Opções"><svg><use href="#scan"/></svg></button>
+<button class="icon" data-editor aria-label="Chat"><svg><use href="#chat"/></svg><span class="counter" data-edit>20</span></button>
+</header>
+<div class="search"><span data-edit>🔥</span><input id="searchField" aria-label="Pesquisar moedas" placeholder="PHB maior valorização"><svg><use href="#search"/></svg></div>
+<section class="balance">
+<div class="balance-label"><span data-edit>Est. de Valor Total(USD)</span><svg><use href="#up"/></svg></div>
+<div class="balance-main"><div class="balance-value" data-edit>$40.70</div><button id="addFunds" class="add-funds"><span data-edit>Adicionar<br>Fundos</span></button></div>
+<div class="pnl"><span class="pnl-label" data-edit>Ganhos e Perdas de hoje</span><span class="pnl-value"><span data-edit>-$0.29335945 (-0.14%)</span><svg><use href="#down"/></svg></span></div>
+</section>
+<section class="markets" id="marketSection">
+<div class="tabs" data-tabs><button data-edit>Favoritos</button><button class="active" data-edit>Populares</button><button data-edit>Alpha</button><button data-edit>Novo</button><button data-edit>Ver</button><button class="list-icon" data-editor aria-label="Editar lista"><svg><use href="#menu"/></svg></button></div>
+<div class="subtabs" data-tabs><button class="active" data-edit>Criptomoedas</button><button data-edit>Futuros</button></div>
+<div class="column-labels"><span data-edit>Nome</span><span data-edit>Último Preço</span><span data-edit>Variação 24h ...</span></div>
+<div class="rows" id="coinRows"></div>
+<button class="more" id="moreCoins" data-edit>Ver mais</button>
+</section>
+<section class="chat" id="chatSection">
+<div class="chat-heading"><span data-edit>Chat</span><svg><use href="#right"/></svg></div>
+<div class="chat-item"><div class="avatar"></div><div class="chat-copy"><div class="chat-name" data-edit>Nome da conta</div><div class="chat-preview" data-edit>Enviaste 20 USDT</div></div><span class="unread" data-edit>1</span></div>
+</section>
+</section>
+
+<div class="bottom" id="bottomNavigation">
+<div class="discover" data-tabs><button class="active" data-edit>Descobrir</button><button data-edit>A seguir</button><button class="notification-dot" data-edit>Campanha</button><button data-edit>Dinheiro ir</button><svg><use href="#up"/></svg></div>
+<nav class="bottom-nav" aria-label="Navegação">
+<button class="active" data-nav="home"><svg><use href="#brand"/></svg><span data-edit>Início</span></button>
+<button data-nav="markets"><svg><use href="#chart"/></svg><span data-edit>Mercados</span></button>
+<button data-nav="success"><svg><use href="#exchange"/></svg><span data-edit>Transacionar</span></button>
+<button data-nav="markets"><svg><use href="#document"/></svg><span data-edit>Futuros</span></button>
+<button data-nav="success"><svg><use href="#wallet"/></svg><span data-edit>Ativos</span></button>
+</nav>
+<div class="home-indicator"></div>
+</div>
+
+<section class="success" id="successScreen" hidden>
+<button class="close-success" id="closeSuccess" aria-label="Voltar"><svg><use href="#close"/></svg></button>
+<div class="success-summary">
+<div class="check-ring"><div class="check-circle"><svg><use href="#check"/></svg></div></div>
+<div class="success-amount"><span class="success-currency" data-edit>MT</span><span data-edit>2,560.56</span></div>
+<p class="success-description" data-edit>Vendidos com sucesso 40,45 USDT</p>
+<button class="verify" id="verifyAssets" data-edit>Verificar Ativos</button>
+</div>
+<section class="rating" id="ratingSection">
+<div class="rating-title" data-edit>Analisar Contraparte</div>
+<div class="rating-buttons">
+<button data-rating="positive" aria-pressed="false"><svg><use href="#thumb"/></svg><span data-edit>Positivo</span></button>
+<button data-rating="negative" aria-pressed="false"><svg style="transform:rotate(180deg)"><use href="#thumb"/></svg><span data-edit>Negativo</span></button>
+</div>
+</section>
+<section class="task" id="taskSection">
+<div class="task-heading" data-edit>Tarefa de Integração</div>
+<div class="task-body"><svg><use href="#lock"/></svg><div class="task-copy" data-edit>Proteção de preços na tua<br>primeira transação</div><button class="trade" id="tradeButton" data-edit>Transacionar</button></div>
+</section>
+</section>
+</main>
+
+<aside class="editor" id="editor" hidden>
+<div class="editor-panel">
+<div class="editor-header"><h2>Editar telas</h2><button id="closeEditor" aria-label="Fechar editor"><svg><use href="#close"/></svg></button></div>
+<label>Editar textos diretamente <input id="editingToggle" type="checkbox"></label>
+<p class="editor-help">Ativa a edição e toca num texto para alterar valores, moedas, nomes e mensagens. Toca num quadro de percentagem para mudar o valor e as cores. Desativa a edição para usar os botões.</p>
+<button class="command primary" id="editCurrent">Editar a tela atual</button>
+<h3>Telas</h3>
+<button class="command" id="showHome">Primeira tela</button>
+<button class="command" id="showSuccess">Segunda tela</button>
+<h3>Cores</h3>
+<label>Fundo <input type="color" data-theme="--bg" value="#202630"></label>
+<label>Quadros <input type="color" data-theme="--surface" value="#272e39"></label>
+<label>Texto <input type="color" data-theme="--text" value="#eeeef0"></label>
+<label>Texto secundário <input type="color" data-theme="--muted" value="#838994"></label>
+<label>Amarelo <input type="color" data-theme="--yellow" value="#f8d32b"></label>
+<label>Símbolo de sucesso <input type="color" data-theme="--green" value="#2bb885"></label>
+<label>Fundo da segunda tela <input type="color" data-theme="--success-bg" value="#22252d"></label>
+<h3>Estrutura</h3>
+<label>Mostrar mercados <input type="checkbox" data-section="marketSection" checked></label>
+<label>Mostrar chat <input type="checkbox" data-section="chatSection" checked></label>
+<label>Mostrar avaliação <input type="checkbox" data-section="ratingSection" checked></label>
+<label>Mostrar tarefa <input type="checkbox" data-section="taskSection" checked></label>
+<label>Largura máxima <input id="phoneWidth" type="number" min="300" max="1200" value="604"></label>
+<label>Espaço antes do sucesso <input id="successSpace" type="number" min="0" max="500" value="130"></label>
+<h3>Moedas: ordem e remoção</h3>
+<div id="rowManager"></div>
+<button class="command" id="addCoin">＋ Adicionar moeda</button>
+<h3>Guardar</h3>
+<button class="command primary" id="saveChanges">Guardar neste navegador</button>
+<button class="command" id="exportHtml">Descarregar HTML editado</button>
+<button class="command" id="resetChanges">Restaurar valores originais</button>
+<p class="editor-status" id="editorStatus" role="status"></p>
+</div>
+</aside>
+
+<dialog class="badge-dialog" id="badgeDialog">
+<form id="badgeForm">
+<h2>Editar percentagem</h2>
+<label>Valor <input id="badgeValue" required></label>
+<label>Cor do quadro <input type="color" id="badgeColor"></label>
+<label>Cor do texto <input type="color" id="badgeTextColor"></label>
+<div class="dialog-actions"><button type="button" id="cancelBadge">Cancelar</button><button class="save" type="submit">Aplicar</button></div>
+</form>
+</dialog>
+
+<script>
+(function(){
+'use strict';
+const $ = id => document.getElementById(id);
+const storageKey = 'telas-editaveis-v1';
+let editing = false;
+let selectedBadge = null;
+const initialRows = [
+ ['BNB','657.42','$657.42','+0.97%','#2bb885',true],
+ ['BTC','77,717.97','$77,717.97','-0.02%','#f54165',true],
+ ['ETH','2,138.67','$2,138.67','+0.11%','#2bb885',true],
+ ['SOL','87.57','$87.57','+1.67%','#2bb885',false],
+ ['XRP','1.3772','$1.38','+0.53%','#2bb885',false]
+];
+
+function editable(tag,text,className){
+ const node=document.createElement(tag);
+ node.textContent=text;
+ node.dataset.edit='';
+ if(className)node.className=className;
+ return node;
+}
+function addRow(values){
+ const [name,price,small,change,color,hot]=values;
+ const row=document.createElement('div');row.className='coin-row';
+ const nameBox=document.createElement('div');nameBox.className='coin-name';
+ nameBox.append(editable('span',name,'coin-symbol'));
+ if(hot)nameBox.append(editable('span','♦','flame'));
+ const priceBox=document.createElement('div');priceBox.className='price';
+ priceBox.append(editable('strong',price),editable('small',small));
+ const badge=document.createElement('button');badge.className='change';
+ badge.textContent=change;badge.style.backgroundColor=color;
+ badge.setAttribute('aria-label','Editar percentagem de '+name);
+ badge.title='Editar valor e cor';
+ row.append(nameBox,priceBox,badge);$('coinRows').append(row);
+ setEditing(editing);renderManager();
+}
+function setEditing(value){
+ editing=value;document.body.classList.toggle('editing',value);
+ $('editingToggle').checked=value;
+ document.querySelectorAll('[data-edit]').forEach(node=>{
+  node.contentEditable=value?'true':'false';node.spellcheck=false;
+ });
+}
+function showScreen(success){
+ $('homeScreen').hidden=success;$('bottomNavigation').hidden=success;
+ $('successScreen').hidden=!success;window.scrollTo(0,0);
+}
+function openEditor(){renderManager();$('editor').hidden=false}
+function closeEditor(){$('editor').hidden=true}
+function rgbToHex(color){
+ if(/^#[0-9a-f]{6}$/i.test(color))return color;
+ const values=color.match(/[\d.]+/g);
+ if(!values || values.length<3)return '#eeeef0';
+ return '#'+values.slice(0,3).map(n=>Math.round(Number(n)).toString(16).padStart(2,'0')).join('');
+}
+function renderManager(){
+ $('rowManager').replaceChildren();
+ [...$('coinRows').children].forEach((row,index)=>{
+  const item=document.createElement('div');item.className='row-manager';
+  const name=document.createElement('span');name.textContent=row.querySelector('.coin-symbol').textContent;
+  item.append(name);
+  [['↑','Subir',()=>{const previous=row.previousElementSibling;if(previous)row.before(previous)}],
+   ['↓','Descer',()=>{const next=row.nextElementSibling;if(next)next.after(row)}],
+   ['×','Remover',()=>row.remove()]].forEach(([text,title,action])=>{
+    const button=document.createElement('button');button.textContent=text;
+    button.title=title;button.setAttribute('aria-label',title+' '+name.textContent);
+    button.onclick=()=>{action();renderManager()};item.append(button);
+   });
+  $('rowManager').append(item);
+ });
+}
+function collectState(){
+ return {
+  home:$('homeScreen').innerHTML,
+  success:$('successScreen').innerHTML,
+  bottom:$('bottomNavigation').innerHTML,
+  rootStyle:document.documentElement.getAttribute('style')||'',
+  phoneStyle:document.querySelector('.phone').getAttribute('style')||'',
+  bottomStyle:$('bottomNavigation').getAttribute('style')||'',
+  sectionSettings:[...document.querySelectorAll('[data-section]')].map(input=>[input.dataset.section,input.checked]),
+  themeSettings:[...document.querySelectorAll('[data-theme]')].map(input=>[input.dataset.theme,input.value]),
+  phoneWidth:$('phoneWidth').value,successSpace:$('successSpace').value,
+  searchValue:$('searchField').value
+ };
+}
+function restoreState(state){
+ if(!state || typeof state.home!=='string' || typeof state.success!=='string')return;
+ $('homeScreen').innerHTML=state.home;$('successScreen').innerHTML=state.success;
+ if(typeof state.bottom==='string')$('bottomNavigation').innerHTML=state.bottom;
+ document.documentElement.setAttribute('style',state.rootStyle||'');
+ document.querySelector('.phone').setAttribute('style',state.phoneStyle||'');
+ $('bottomNavigation').setAttribute('style',state.bottomStyle||'');
+ (state.sectionSettings||[]).forEach(([id,checked])=>{
+  const node=document.querySelector('[data-section="'+id+'"]');if(node)node.checked=checked;
+ });
+ (state.themeSettings||[]).forEach(([name,value])=>{
+  const node=document.querySelector('[data-theme="'+name+'"]');if(node)node.value=value;
+ });
+ $('phoneWidth').value=state.phoneWidth||604;$('successSpace').value=state.successSpace||130;
+ $('searchField').value=state.searchValue||'';
+ setEditing(false);showScreen(false);renderManager();
+}
+if(!$('coinRows').children.length)initialRows.forEach(addRow);
+const originalState=collectState();
+try{const saved=localStorage.getItem(storageKey);if(saved)restoreState(JSON.parse(saved))}catch(error){}
+setEditing(false);showScreen(false);
+
+// Delegação mantém os botões funcionais depois de guardar ou restaurar.
+document.addEventListener('click',event=>{
+ const target=event.target instanceof Element?event.target:null;if(!target)return;
+ const badge=target.closest('.change');
+ if(badge){
+  selectedBadge=badge;$('badgeValue').value=badge.textContent.trim();
+  const style=getComputedStyle(badge);
+  $('badgeColor').value=rgbToHex(style.backgroundColor);
+  $('badgeTextColor').value=rgbToHex(style.color);
+  $('badgeDialog').showModal();return;
+ }
+ if(target.closest('#openEditor,[data-editor]')){openEditor();return}
+ if(editing && target.closest('[data-edit]'))return;
+ if(target.closest('#addFunds')){showScreen(true);return}
+ if(target.closest('#closeSuccess,#verifyAssets,#tradeButton')){showScreen(false);return}
+ const nav=target.closest('[data-nav]');
+ if(nav){
+  if(nav.dataset.nav==='success')showScreen(true);
+  else{showScreen(false);if(nav.dataset.nav==='markets')$('marketSection').scrollIntoView({behavior:'smooth'})}
+  return;
+ }
+ const rating=target.closest('[data-rating]');
+ if(rating){
+  document.querySelectorAll('[data-rating]').forEach(node=>{
+   const active=node===rating;node.classList.toggle('selected',active);
+   node.setAttribute('aria-pressed',String(active));
+  });return;
+ }
+ const tab=target.closest('[data-tabs] button');
+ if(tab){tab.parentElement.querySelectorAll('button').forEach(node=>node.classList.toggle('active',node===tab));return}
+ const switchButton=target.closest('.top-switch button');
+ if(switchButton){
+  switchButton.parentElement.querySelectorAll('button').forEach(node=>node.classList.toggle('active',node===switchButton));
+  if(switchButton.textContent.trim()==='Carteira')showScreen(true);
+ }
+ if(target.closest('#moreCoins')){openEditor()}
+});
+document.addEventListener('input',event=>{
+ if(event.target.id==='searchField'){
+  const query=event.target.value.trim().toLowerCase();
+  [...$('coinRows').children].forEach(row=>row.hidden=!row.querySelector('.coin-symbol').textContent.toLowerCase().includes(query));
+ }
+});
+$('closeEditor').onclick=closeEditor;
+$('editor').addEventListener('click',event=>{if(event.target===$('editor'))closeEditor()});
+$('editingToggle').onchange=event=>setEditing(event.target.checked);
+$('editCurrent').onclick=()=>{setEditing(true);closeEditor()};
+$('showHome').onclick=()=>{showScreen(false);closeEditor()};
+$('showSuccess').onclick=()=>{showScreen(true);closeEditor()};
+document.querySelectorAll('[data-theme]').forEach(input=>input.oninput=()=>document.documentElement.style.setProperty(input.dataset.theme,input.value));
+document.querySelectorAll('[data-section]').forEach(input=>input.onchange=()=>{$(input.dataset.section).hidden=!input.checked});
+$('phoneWidth').oninput=event=>{
+ const width=Math.max(300,Math.min(1200,Number(event.target.value)||604));
+ document.querySelector('.phone').style.maxWidth=width+'px';$('bottomNavigation').style.maxWidth=width+'px';
+};
+$('successSpace').oninput=event=>{
+ const space=Math.max(0,Math.min(500,Number(event.target.value)||0));
+ document.querySelector('.success-summary').style.paddingTop=space+'px';
+};
+$('addCoin').onclick=()=>addRow(['MOEDA','0.00','$0.00','+0.00%','#2bb885',false]);
+$('cancelBadge').onclick=()=>$('badgeDialog').close();
+$('badgeForm').onsubmit=event=>{
+ event.preventDefault();if(!selectedBadge)return;
+ selectedBadge.textContent=$('badgeValue').value;
+ selectedBadge.style.backgroundColor=$('badgeColor').value;
+ selectedBadge.style.color=$('badgeTextColor').value;
+ $('badgeDialog').close();selectedBadge=null;
+};
+$('saveChanges').onclick=()=>{
+ try{localStorage.setItem(storageKey,JSON.stringify(collectState()));$('editorStatus').textContent='Alterações guardadas.'}
+ catch(error){$('editorStatus').textContent='Não foi possível guardar. Descarrega o HTML editado.'}
+};
+$('resetChanges').onclick=()=>{
+ if(!confirm('Restaurar os valores e as cores originais?'))return;
+ try{localStorage.removeItem(storageKey)}catch(error){}
+ restoreState(originalState);$('editorStatus').textContent='Valores originais restaurados.';
+};
+$('exportHtml').onclick=()=>{
+ const clone=document.documentElement.cloneNode(true);
+ clone.querySelector('#editor').hidden=true;clone.querySelector('#badgeDialog').removeAttribute('open');
+ clone.querySelector('body').classList.remove('editing');
+ clone.querySelectorAll('[data-edit]').forEach(node=>node.setAttribute('contenteditable','false'));
+ clone.querySelector('#editingToggle').checked=false;clone.querySelector('#editingToggle').removeAttribute('checked');
+ clone.querySelector('#homeScreen').hidden=false;clone.querySelector('#bottomNavigation').hidden=false;clone.querySelector('#successScreen').hidden=true;
+ const search=clone.querySelector('#searchField');search.value='';search.setAttribute('value','');
+ clone.querySelectorAll('.coin-row').forEach(row=>row.hidden=false);
+ clone.querySelectorAll('[data-section]').forEach(input=>{if(input.checked)input.setAttribute('checked','');else input.removeAttribute('checked')});
+ document.querySelectorAll('[data-theme]').forEach(input=>clone.querySelector('[data-theme="'+input.dataset.theme+'"]').setAttribute('value',input.value));
+ ['phoneWidth','successSpace'].forEach(id=>clone.querySelector('#'+id).setAttribute('value',$(id).value));
+ const blob=new Blob(['<!DOCTYPE html>\n'+clone.outerHTML],{type:'text/html;charset=utf-8'});
+ const url=URL.createObjectURL(blob);const link=document.createElement('a');
+ link.href=url;link.download='telas-editadas.html';document.body.append(link);link.click();link.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+document.addEventListener('keydown',event=>{
+ if(event.key==='Escape'){closeEditor();if($('badgeDialog').open)$('badgeDialog').close()}
+});
+})();
+</script>
+</body>
+</html>
